@@ -9,3 +9,4 @@ class Movie():
         self.description = movie['description']
         self.tmdb_id = int(movie['link'].split('/')[-1])
         self.fb_id = movie['fb_link'].split('/')[-1]
+        self.image_url = movie['image_url']

@@ -12,26 +12,26 @@ USER_TYPE = 'User'
 GRAPH = Graph(user = DB_USER, password = DB_PWD)
 
 def init():
-    graph.delete_all()
-    movies = json.load(open("dump.json"))
+    GRAPH.delete_all()
+    movies = json.load(open("dump_with_images.json"))
 
     for movie in movies:
         movieDict = vars(Movie(movie))
-        graph.create(Node(MOVIE_TYPE, **movieDict))
+        GRAPH.create(Node(MOVIE_TYPE, **movieDict))
 
     ratings = pd.read_csv("final_reduced_ratings.csv")
 
     current_id, user = '', None
     for index, row in ratings.iterrows():
-        movie = graph.nodes.match(MOVIE_TYPE, tmdb_id = int(row['tmdbId'])).first()
+        movie = GRAPH.nodes.match(MOVIE_TYPE, tmdb_id = int(row['tmdbId'])).first()
         if not movie: continue
 
         if row['userId'] != current_id:
             user = Node(USER_TYPE, name = "anonymous" + str(row['userId']))
-            graph.create(user)
+            GRAPH.create(user)
             current_id = row['userId']
 
-        graph.create(Relationship(user, "LIKES", movie))
+        GRAPH.create(Relationship(user, "LIKES", movie))
 
 def getLikesCount(userName):
     "Returns the number of movies the given user likes"
