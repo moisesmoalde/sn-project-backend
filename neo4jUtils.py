@@ -70,7 +70,7 @@ def deleteSimilarities(userName):
         MATCH (u:User {{name: '{0}'}})-[r:SIMILAR]->()
         DELETE r'''.format(userName))
 
-def getRecommendedMovies(userName):
+def getRecommendedMovies(userName, skip = 0, limit = 10):
     "Returns movies ordered by the number of likes from similar users"
     return GRAPH.run('''
                 MATCH (u01:User {{name:'{0}'}})-[:SIMILAR]-(u02)
@@ -79,8 +79,9 @@ def getRecommendedMovies(userName):
                 MATCH (u2)-[:LIKES]->(m2)
                 WHERE NOT (u1)-[:LIKES]->(m2)
                 WITH uCount, m2, COUNT(m2) AS mCount
-                RETURN DISTINCT m2 AS movie, mCount/uCount AS score ORDER BY score DESC'''
-                .format(userName)).data()
+                RETURN DISTINCT m2 AS movie, mCount/uCount AS score
+                ORDER BY score DESC SKIP {1} LIMIT {2}'''
+                .format(userName, skip, limit)).data()
 
 
 if __name__ == '__main__':
