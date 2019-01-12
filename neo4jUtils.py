@@ -3,11 +3,14 @@ import json
 import pandas as pd
 
 from Movie import Movie
+from User import User
 
 DB_USER = 'neo4j'
 DB_PWD = 'mesopotamia'
 MOVIE_TYPE = 'Movie'
 USER_TYPE = 'User'
+LIKES_TYPE = 'LIKES'
+DISLIKES_TYPE = 'DISLIKES'
 
 GRAPH = Graph(user = DB_USER, password = DB_PWD)
 
@@ -31,7 +34,7 @@ def init():
             GRAPH.create(user)
             current_id = row['userId']
 
-        GRAPH.create(Relationship(user, "LIKES", movie))
+        GRAPH.create(Relationship(user, LIKES_TYPE, movie))
 
 def getLikesCount(userName):
     "Returns the number of movies the given user likes"
@@ -82,6 +85,19 @@ def getRecommendedMovies(userName, skip = 0, limit = 10):
                 RETURN DISTINCT m2 AS movie, mCount/uCount AS score
                 ORDER BY score DESC SKIP {1} LIMIT {2}'''
                 .format(userName, skip, limit)).data()
+
+def insertUser(fbID, email, name, surname):
+    "Insert new user in the graph database"
+    userDict = vars(User(fbID, email, name, surname))
+    GRAPH.merge(Node(USER_TYPE, **userDict), USER_TYPE, "email")
+
+def insertEdge(email, movieFBID, edgeType = LIKES_TYPE):
+    "Insert relationship between the user and the movie of the given type"
+    GRAPH.run('''
+        MATCH (u:User {{name : '{0}'}})
+        MATCH (m:Movie {{fb_id : '{1}'}})
+        MERGE (u)-[:{2}]->(m)'''
+        .format(email, movieFBID, edgeType))
 
 
 if __name__ == '__main__':
