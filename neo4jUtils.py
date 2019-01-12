@@ -81,6 +81,7 @@ def getRecommendedMovies(userName, skip = 0, limit = 10):
                 MATCH (u1:User {{name:'{0}'}})-[:SIMILAR]-(u2)
                 MATCH (u2)-[:LIKES]->(m2)
                 WHERE NOT (u1)-[:LIKES]->(m2)
+                AND NOT (u1)-[:DISLIKES]->(m2)
                 WITH uCount, m2, COUNT(m2) AS mCount
                 RETURN DISTINCT m2 AS movie, mCount/uCount AS score
                 ORDER BY score DESC SKIP {1} LIMIT {2}'''
