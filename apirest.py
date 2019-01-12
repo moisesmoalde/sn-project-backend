@@ -38,7 +38,8 @@ class ApiRest():
 		for i in movies_likes:
 			movieFBID = i['fbID']
 			r = neo4jUtils.insertEdge(name, movieFBID, 'LIKES')
-			
+		
+		similarity. setAllSimilarities(name)
 		user = GRAPH.run('''
 				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
 			   '''
@@ -57,7 +58,8 @@ class ApiRest():
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
 	def MovieRecommendation(self, id, skip, limit):
-		movies = neo4jUtils.getRecommendedMovies(id,skip,limit)
+		movies = dict()
+		movies['movies'] = neo4jUtils.getRecommendedMovies(id,skip,limit)
 		print(movies)
 		return movies
 	
@@ -71,6 +73,7 @@ class ApiRest():
 		for i in movies_likes:
 			movieFBID = i['fbID']
 			r = neo4jUtils.insertEdge(email, movieFBID, 'LIKES')
+		similarity. setAllSimilarities(email)	
 		user = GRAPH.run('''
 				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
 			   '''
@@ -81,7 +84,7 @@ class ApiRest():
 def start_server():
 		cherrypy.tree.mount(ApiRest(), '/')
 		cherrypy.config.update({'error_page.404': error_page_404})
-		cherrypy.config.update({'server.socket_port': 8980})
+		cherrypy.config.update({'server.socket_port': 9990})
 		cherrypy.engine.start()
 
 if __name__ == '__main__':
