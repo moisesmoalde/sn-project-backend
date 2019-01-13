@@ -27,7 +27,7 @@ class ApiRest():
 		
 		fbID = input_json['facebook-id']
 		movies_likes = input_json['movies']
-		name = input_json['name']
+		name = input_json['firstname']
 		surname = input_json['lastname']
 		neo4jUtils. insertUser(fbID, email, name, surname)
 		for i in movies_likes:
