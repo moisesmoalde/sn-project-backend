@@ -37,9 +37,9 @@ class ApiRest():
 		neo4jUtils. insertUser(fbID, email, name, surname)
 		for i in movies_likes:
 			movieFBID = i['fbID']
-			r = neo4jUtils.insertEdge(name, movieFBID, 'LIKES')
+			r = neo4jUtils.insertEdge(email, movieFBID, 'LIKES')
 		
-		similarity. setAllSimilarities(name)
+		similarity. setAllSimilarities(email)
 		user = GRAPH.run('''
 				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
 			   '''
@@ -50,7 +50,7 @@ class ApiRest():
 	@cherrypy.tools.json_out()
 	def GetUser(self, id):
 		user = GRAPH.run('''
-				MATCH (user:User)-[:LIKES]-(movies) WHERE user.name = "{0}" RETURN user,movies;
+				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
 			   '''
                 .format(id)).data()
 		return user

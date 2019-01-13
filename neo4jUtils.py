@@ -36,14 +36,14 @@ def init():
 
         GRAPH.create(Relationship(user, LIKES_TYPE, movie))
 
-def getLikesCount(userName):
+def getLikesCount(email):
     "Returns the number of movies the given user likes"
     return GRAPH.run('''
                 MATCH r = (u)-->(m)
-                WHERE u.name = '{0}'
-                RETURN COUNT(m)'''.format(userName)).evaluate()
+                WHERE u.email = '{0}'
+                RETURN COUNT(m)'''.format(email)).evaluate()
 
-def getUsersWithCommonLikes(userName):
+def getUsersWithCommonLikes(email):
     ''' Returns other users with common liked movies
     Each entry is a triple (ID, N1, N2) where:
     - ID is the ID of the other user in the DB
@@ -54,38 +54,38 @@ def getUsersWithCommonLikes(userName):
                 MATCH r1=(u1)-->(m1)
                 MATCH r2=(u2)-->(m1)
                 MATCH r3=(u2)-->(m2)
-                WHERE u1.name = '{0}' AND NOT u2.name = '{0}'
+                WHERE u1.email = '{0}' AND NOT u2.email = '{0}'
                 RETURN DISTINCT ID(u2), COUNT(DISTINCT r1), COUNT(DISTINCT r3)'''
-                .format(userName))
+                .format(email))
 
-def updateSimilarity(userName, otherID, similarity):
+def updateSimilarity(email, otherID, similarity):
     "Creates or updates the similarity edge between the given users"
     GRAPH.run('''
-        MATCH (u1:User {{name:'{0}'}})
+        MATCH (u1:User {{email:'{0}'}})
         MATCH (u2:User)
         WHERE ID(u2) = {1}
         MERGE (u1)-[:SIMILAR{{similarity: {2} }}]->(u2)'''
-        .format(userName, otherID, similarity))
+        .format(email, otherID, similarity))
 
-def deleteSimilarities(userName):
+def deleteSimilarities(email):
     "Deletes all similarity relationships with other users"
     GRAPH.run('''
-        MATCH (u:User {{name: '{0}'}})-[r:SIMILAR]->()
-        DELETE r'''.format(userName))
+        MATCH (u:User {{email: '{0}'}})-[r:SIMILAR]->()
+        DELETE r'''.format(email))
 
-def getRecommendedMovies(userName, skip = 0, limit = 10):
+def getRecommendedMovies(email, skip = 0, limit = 10):
     "Returns movies ordered by the number of likes from similar users"
     return GRAPH.run('''
-                MATCH (u01:User {{name:'{0}'}})-[:SIMILAR]-(u02)
+                MATCH (u01:User {{email:'{0}'}})-[:SIMILAR]-(u02)
                 WITH TOFLOAT(COUNT(u02)) AS uCount
-                MATCH (u1:User {{name:'{0}'}})-[:SIMILAR]-(u2)
+                MATCH (u1:User {{email:'{0}'}})-[:SIMILAR]-(u2)
                 MATCH (u2)-[:LIKES]->(m2)
                 WHERE NOT (u1)-[:LIKES]->(m2)
                 AND NOT (u1)-[:DISLIKES]->(m2)
                 WITH uCount, m2, COUNT(m2) AS mCount
                 RETURN DISTINCT m2 AS movie, mCount/uCount AS score
                 ORDER BY score DESC SKIP {1} LIMIT {2}'''
-                .format(userName, skip, limit)).data()
+                .format(email, skip, limit)).data()
 
 def insertUser(fbID, email, name, surname):
     "Insert new user in the graph database"

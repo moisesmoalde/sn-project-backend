@@ -9,11 +9,11 @@ THRES = 0.5
 def main():
     setAllSimilarities("anonymous100")
 
-def setAllSimilarities(userName):
+def setAllSimilarities(email):
     "Sets similarity with all users with common liked movies"
-    db.deleteSimilarities(userName)
-    userLikes = db.getLikesCount(userName)
-    others = db.getUsersWithCommonLikes(userName)
+    db.deleteSimilarities(email)
+    userLikes = db.getLikesCount(email)
+    others = db.getUsersWithCommonLikes(email)
 
     while others.forward():
         otherID = others.current[0]
@@ -22,7 +22,7 @@ def setAllSimilarities(userName):
         similarity = stats.hmean([common/userLikes, common/otherLikes])
 
         if similarity >= THRES:
-            db.updateSimilarity(userName, otherID, similarity)
+            db.updateSimilarity(email, otherID, similarity)
 
 if __name__ == '__main__':
     main()
