@@ -12,12 +12,7 @@ import neo4jUtils
 def error_page_404(status, message, traceback, version):
     return "404 Error!"
 
-DB_USER = 'app'
-DB_PWD = 'apirest'
-MOVIE_TYPE = 'Movie'
-USER_TYPE = 'User'
-
-GRAPH = Graph(user = DB_USER, password = DB_PWD)
+GRAPH = Graph(user = neo4jUtils.DB_USER, password = neo4jUtils.DB_PWD)
 	
 class ApiRest():
 	
@@ -37,7 +32,7 @@ class ApiRest():
 		neo4jUtils. insertUser(fbID, email, name, surname)
 		for i in movies_likes:
 			movieFBID = i['fb_id']
-			r = neo4jUtils.insertEdge(email, movieFBID, 'LIKES')
+			r = neo4jUtils.insertEdge(email, movieFBID, LIKES_TYPE)
 		
 		similarity. setAllSimilarities(email)
 		user = GRAPH.run('''
@@ -70,9 +65,14 @@ class ApiRest():
 		input_json = cherrypy.request.json
 		movies_likes = input_json['likes']
 		movies_dislikes = input_json['dislikes']
-		for i in movies_likes:
-			movieFBID = i['fb_id']
-			r = neo4jUtils.insertEdge(email, movieFBID, 'LIKES')
+		if  movies_likes:
+			for i in movies_likes:
+				movieFBID = i['fb_id']
+				r = neo4jUtils.insertEdge(email, movieFBID, neo4jUtils.LIKES_TYPE)
+		if   movies_dislikes:		
+			for i in movies_dislikes:
+				movieFBID = i['fb_id']
+				r = neo4jUtils.insertEdge(email, movieFBID, neo4jUtils.DISLIKES_TYPE)	
 		similarity. setAllSimilarities(email)	
 		user = GRAPH.run('''
 				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
@@ -84,7 +84,7 @@ class ApiRest():
 def start_server():
 		cherrypy.tree.mount(ApiRest(), '/')
 		cherrypy.config.update({'error_page.404': error_page_404})
-		cherrypy.config.update({'server.socket_port': 9999})
+		cherrypy.config.update({'server.socket_port': 8080})
 		cherrypy.config.update({'server.socket_host': '0.0.0.0'})
 		cherrypy.engine.start()
 
