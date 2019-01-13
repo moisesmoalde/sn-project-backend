@@ -5,8 +5,8 @@ import pandas as pd
 from Movie import Movie
 from User import User
 
-DB_USER = 'neo4j'
-DB_PWD = 'mesopotamia'
+DB_USER = 'app'
+DB_PWD = 'apirest'
 MOVIE_TYPE = 'Movie'
 USER_TYPE = 'User'
 LIKES_TYPE = 'LIKES'
