@@ -12,8 +12,8 @@ import neo4jUtils
 def error_page_404(status, message, traceback, version):
     return "404 Error!"
 
-DB_USER = 'appi'
-DB_PWD = 'apirest'
+DB_USER = 'neo4j'
+DB_PWD = 'mesopotamia'
 MOVIE_TYPE = 'Movie'
 USER_TYPE = 'User'
 
@@ -49,6 +49,7 @@ class ApiRest():
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
 	def GetUser(self, id):
+		print(id)
 		user = GRAPH.run('''
 				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
 			   '''
@@ -60,7 +61,6 @@ class ApiRest():
 	def MovieRecommendation(self, id, skip, limit):
 		movies = dict()
 		movies['movies'] = neo4jUtils.getRecommendedMovies(id,skip,limit)
-		print(movies)
 		return movies
 	
 	@cherrypy.expose
@@ -85,6 +85,7 @@ def start_server():
 		cherrypy.tree.mount(ApiRest(), '/')
 		cherrypy.config.update({'error_page.404': error_page_404})
 		cherrypy.config.update({'server.socket_port': 9990})
+		cherrypy.config.update({'server.socket_host': '0.0.0.0'})
 		cherrypy.engine.start()
 
 if __name__ == '__main__':

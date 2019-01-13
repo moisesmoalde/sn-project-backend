@@ -54,7 +54,7 @@ def getUsersWithCommonLikes(email):
                 MATCH r1=(u1)-->(m1)
                 MATCH r2=(u2)-->(m1)
                 MATCH r3=(u2)-->(m2)
-                WHERE u1.email = '{0}' AND NOT u2.email = '{0}'
+                WHERE u1.email = '{0}' AND NOT u1 = u2
                 RETURN DISTINCT ID(u2), COUNT(DISTINCT r1), COUNT(DISTINCT r3)'''
                 .format(email))
 
@@ -95,7 +95,7 @@ def insertUser(fbID, email, name, surname):
 def insertEdge(email, movieFBID, edgeType = LIKES_TYPE):
     "Insert relationship between the user and the movie of the given type"
     GRAPH.run('''
-        MATCH (u:User {{name : '{0}'}})
+        MATCH (u:User {{email : '{0}'}})
         MATCH (m:Movie {{fb_id : '{1}'}})
         MERGE (u)-[:{2}]->(m)'''
         .format(email, movieFBID, edgeType))
