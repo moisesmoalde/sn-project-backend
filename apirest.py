@@ -35,20 +35,39 @@ class ApiRest():
 			r = neo4jUtils.insertEdge(email, movieFBID, LIKES_TYPE)
 		
 		similarity. setAllSimilarities(email)
-		user = GRAPH.run('''
-				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
+		user = dict()
+		list_movies = list()
+		r = GRAPH.run('''
+				MATCH (user:User)-[:LIKES]-(movie) WHERE user.email = "{0}" RETURN movie;
 			   '''
-                .format(email)).data()	
+                .format(id)).data()
+		for i in r:
+			list_movies.append(r[0]['movie'])
+		user['movies'] = list_movies
+		r = GRAPH.run('''
+				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
+			   '''
+                .format(id)).data()
+		user['user'] = r[0]['user']		
 		return user
 		
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
 	def GetUser(self, id):
-		print(id)
-		user = GRAPH.run('''
-				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
+		user = dict()
+		list_movies = list()
+		r = GRAPH.run('''
+				MATCH (user:User)-[:LIKES]-(movie) WHERE user.email = "{0}" RETURN movie;
 			   '''
                 .format(id)).data()
+		for i in r:
+			list_movies.append(r[0]['movie'])
+		user['movies'] = list_movies
+		r = GRAPH.run('''
+				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
+			   '''
+                .format(id)).data()
+		user['user'] = r[0]['user']		
 		return user
 	
 	@cherrypy.expose
@@ -74,10 +93,20 @@ class ApiRest():
 				movieFBID = i['fb_id']
 				r = neo4jUtils.insertEdge(email, movieFBID, neo4jUtils.DISLIKES_TYPE)	
 		similarity. setAllSimilarities(email)	
-		user = GRAPH.run('''
-				MATCH (user:User)-[:LIKES]-(movies) WHERE user.email = "{0}" RETURN user,movies;
+		user = dict()
+		list_movies = list()
+		r = GRAPH.run('''
+				MATCH (user:User)-[:LIKES]-(movie) WHERE user.email = "{0}" RETURN movie;
 			   '''
-                .format(email)).data()		
+                .format(id)).data()
+		for i in r:
+			list_movies.append(r[0]['movie'])
+		user['movies'] = list_movies
+		r = GRAPH.run('''
+				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
+			   '''
+                .format(id)).data()
+		user['user'] = r[0]['user']				
 		return user	
 
 
