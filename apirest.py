@@ -47,7 +47,7 @@ class ApiRest():
 		r = GRAPH.run('''
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
 			   '''
-                .format(id)).data()
+                .format(email)).data()
 		user['user'] = r[0]['user']		
 		return user
 		
@@ -98,7 +98,7 @@ class ApiRest():
 		r = GRAPH.run('''
 				MATCH (user:User)-[:LIKES]-(movie) WHERE user.email = "{0}" RETURN movie;
 			   '''
-                .format(id)).data()
+                .format(email)).data()
 		for i in r:
 			list_movies.append(r[0]['movie'])
 		user['movies'] = list_movies
