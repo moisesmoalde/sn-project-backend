@@ -13,18 +13,18 @@ def error_page_404(status, message, traceback, version):
     return "404 Error!"
 
 GRAPH = Graph(user = neo4jUtils.DB_USER, password = neo4jUtils.DB_PWD)
-	
+
 class ApiRest():
-	
+
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
 	@cherrypy.tools.json_in()
 	def AddUser (self, **kwargs):
-	
+
 		input_json = cherrypy.request.json
 		print(input_json)
 		email = input_json['email']
-		
+
 		fbID = input_json['facebook-id']
 		movies_likes = input_json['movies']
 		name = input_json['firstname']
@@ -33,7 +33,7 @@ class ApiRest():
 		for i in movies_likes:
 			movieFBID = i['fb_id']
 			r = neo4jUtils.insertEdge(email, movieFBID, LIKES_TYPE)
-		
+
 		similarity. setAllSimilarities(email)
 		user = dict()
 		list_movies = list()
@@ -48,9 +48,9 @@ class ApiRest():
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
 			   '''
                 .format(email)).data()
-		user['user'] = r[0]['user']		
+		user['user'] = r[0]['user']
 		return user
-		
+
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
 	def GetUser(self, id):
@@ -67,16 +67,16 @@ class ApiRest():
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
 			   '''
                 .format(id)).data()
-		user['user'] = r[0]['user']		
+		user['user'] = r[0]['user']
 		return user
-	
+
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
 	def MovieRecommendation(self, id, skip, limit):
 		movies = dict()
 		movies['movies'] = neo4jUtils.getRecommendedMovies(id,skip,limit)
 		return movies
-	
+
 	@cherrypy.expose
 	@cherrypy.tools.json_out()
 	@cherrypy.tools.json_in()
@@ -88,11 +88,11 @@ class ApiRest():
 			for i in movies_likes:
 				movieFBID = i['fb_id']
 				r = neo4jUtils.insertEdge(email, movieFBID, neo4jUtils.LIKES_TYPE)
-		if   movies_dislikes:		
+		if   movies_dislikes:
 			for i in movies_dislikes:
 				movieFBID = i['fb_id']
-				r = neo4jUtils.insertEdge(email, movieFBID, neo4jUtils.DISLIKES_TYPE)	
-		similarity. setAllSimilarities(email)	
+				r = neo4jUtils.insertEdge(email, movieFBID, neo4jUtils.DISLIKES_TYPE)
+		similarity. setAllSimilarities(email)
 		user = dict()
 		list_movies = list()
 		r = GRAPH.run('''
@@ -105,9 +105,9 @@ class ApiRest():
 		r = GRAPH.run('''
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
 			   '''
-                .format(id)).data()
-		user['user'] = r[0]['user']				
-		return user	
+                .format(email)).data()
+		user['user'] = r[0]['user']
+		return user
 
 
 def start_server():
