@@ -87,9 +87,9 @@ def getRecommendedMovies(email, skip = 0, limit = 10):
                 ORDER BY score DESC SKIP {1} LIMIT {2}'''
                 .format(email, skip, limit)).data()
 
-def insertUser(fbID, email, name, surname):
+def insertUser(fbID, email, name):
     "Insert new user in the graph database"
-    userDict = vars(User(fbID, email, name, surname))
+    userDict = vars(User(fbID, email, name,''))
     GRAPH.merge(Node(USER_TYPE, **userDict), USER_TYPE, "email")
 
 def insertEdge(email, movieFBID, edgeType = LIKES_TYPE):

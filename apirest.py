@@ -20,21 +20,18 @@ class ApiRest():
 	@cherrypy.tools.json_out()
 	@cherrypy.tools.json_in()
 	def AddUser (self, **kwargs):
-
 		input_json = cherrypy.request.json
-		print(input_json)
 		email = input_json['email']
-
-		fbID = input_json['fb_id']
+		fbID = input_json['id']
 		movies_likes = input_json['movies']
-		name = input_json['firstname']
-		surname = input_json['lastname']
-		neo4jUtils. insertUser(fbID, email, name, surname)
+		name = input_json['name']
+		neo4jUtils. insertUser(fbID, email, name)
 		for i in movies_likes:
-			movieFBID = i['fb_id']
-			r = neo4jUtils.insertEdge(email, movieFBID, LIKES_TYPE)
-
+			movieFBID = i['id']
+			r = neo4jUtils.insertEdge(email, movieFBID, neo4jUtils.LIKES_TYPE)
+		print('hola1')
 		similarity. setAllSimilarities(email)
+		print('hola')
 		user = dict()
 		list_movies = list()
 		r = GRAPH.run('''
@@ -47,7 +44,7 @@ class ApiRest():
 		r = GRAPH.run('''
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
 			   '''
-                .format(email)).data()
+                .format(id)).data()
 		if r:		
 			user['user'] = r[0]['user']
 		else:
