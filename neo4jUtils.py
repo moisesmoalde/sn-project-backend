@@ -96,7 +96,7 @@ def insertEdge(email, movieFBID, edgeType = LIKES_TYPE):
     "Insert relationship between the user and the movie of the given type"
     GRAPH.run('''
         MATCH (u:User {{email : '{0}'}})
-        MATCH (m:Movie {{fb_id : '{1}'}})
+        MATCH (m:Movie {{fb_id : {1}}})
         MERGE (u)-[:{2}]->(m)'''
         .format(email, movieFBID, edgeType))
 
