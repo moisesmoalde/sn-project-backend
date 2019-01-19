@@ -42,7 +42,7 @@ class ApiRest():
 			   '''
                 .format(id)).data()
 		for i in r:
-			list_movies.append(r[i]['movie'])
+			list_movies.append(i['movie'])
 		user['movies'] = list_movies
 		r = GRAPH.run('''
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
@@ -61,7 +61,7 @@ class ApiRest():
 			   '''
                 .format(id)).data()
 		for i in r:
-			list_movies.append(r[i]['movie'])
+			list_movies.append(i['movie'])
 		user['movies'] = list_movies
 		r = GRAPH.run('''
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
@@ -100,7 +100,7 @@ class ApiRest():
 			   '''
                 .format(email)).data()
 		for i in r:
-			list_movies.append(r[i]['movie'])
+			list_movies.append(i['movie'])
 		user['movies'] = list_movies
 		r = GRAPH.run('''
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
