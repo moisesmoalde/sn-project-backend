@@ -25,7 +25,7 @@ class ApiRest():
 		print(input_json)
 		email = input_json['email']
 
-		fbID = input_json['facebook-id']
+		fbID = input_json['fb_id']
 		movies_likes = input_json['movies']
 		name = input_json['firstname']
 		surname = input_json['lastname']
@@ -48,7 +48,10 @@ class ApiRest():
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
 			   '''
                 .format(email)).data()
-		user['user'] = r[0]['user']
+		if r:		
+			user['user'] = r[0]['user']
+		else:
+			user = []
 		return user
 
 	@cherrypy.expose
@@ -67,7 +70,10 @@ class ApiRest():
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
 			   '''
                 .format(id)).data()
-		user['user'] = r[0]['user']
+		if r:		
+			user['user'] = r[0]['user']
+		else:
+			user = []
 		return user
 
 	@cherrypy.expose
@@ -106,7 +112,10 @@ class ApiRest():
 				MATCH (user:User) WHERE user.email = "{0}" RETURN user;
 			   '''
                 .format(email)).data()
-		user['user'] = r[0]['user']
+		if r:		
+			user['user'] = r[0]['user']
+		else:
+			user = []
 		return user
 
 
