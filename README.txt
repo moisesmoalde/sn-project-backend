@@ -1,5 +1,7 @@
 GET USER CALL:
 
+http://IP:8080/GetUser/l@gmail.com
+
 {
     "movies": [
         {
