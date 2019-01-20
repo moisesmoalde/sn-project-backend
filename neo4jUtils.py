@@ -75,7 +75,7 @@ def deleteSimilarities(email):
 
 def getRecommendedMovies(email, skip = 0, limit = 10):
     "Returns movies ordered by the number of likes from similar users"
-    return GRAPH.run('''
+    res = GRAPH.run('''
                 MATCH (u01:User {{email:'{0}'}})-[:SIMILAR]-(u02)
                 WITH TOFLOAT(COUNT(u02)) AS uCount
                 MATCH (u1:User {{email:'{0}'}})-[:SIMILAR]-(u2)
@@ -86,6 +86,19 @@ def getRecommendedMovies(email, skip = 0, limit = 10):
                 RETURN DISTINCT m2 AS movie, mCount/uCount AS score
                 ORDER BY score DESC SKIP {1} LIMIT {2}'''
                 .format(email, skip, limit)).data()
+
+    return (res if res else getPopularMovies(skip, limit))
+
+def getPopularMovies(skip = 0, limit = 10):
+    "Returns movies ordered by the number of likes overall"
+    return GRAPH.run('''
+                MATCH (movie:Movie)
+                WITH SIZE(()-[:LIKES]->(movie)) AS likes,
+                     SIZE(()-[:DISLIKES]->(movie)) AS dislikes,
+                     movie
+                RETURN movie, (likes - dislikes) AS score
+                ORDER BY score DESC SKIP {0} LIMIT {1}'''
+                .format(skip, limit)).data()
 
 def insertUser(fbID, email, name):
     "Insert new user in the graph database"
